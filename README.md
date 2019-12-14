@@ -18,7 +18,7 @@
 
 	GitHub: [https://github.com/shines77/tdPack2_classic](https://github.com/shines77/tdPack2_classic)
 
-*  **[English / 英文]**
+* **[English / 英文]**
 
 	## Introduction
 
@@ -28,16 +28,16 @@
 
 	## Original version
 
-	官方主页: [https://www.curseforge.com/wow/addons/tdpack2](https://www.curseforge.com/wow/addons/tdpack2)
+	Homepage: [https://www.curseforge.com/wow/addons/tdpack2](https://www.curseforge.com/wow/addons/tdpack2)
 
-	NGA论坛: [http://nga.178.com/read.php?tid=18399336](http://nga.178.com/read.php?tid=18399336)
+	NGA BBS: [http://nga.178.com/read.php?tid=18399336](http://nga.178.com/read.php?tid=18399336)
 
 	## Modified version
 
 	GitHub: [https://github.com/shines77/tdPack2_classic](https://github.com/shines77/tdPack2_classic)
 
-* Preview / 预览
+* **[Preview / 预览]**
 
 	## Preview / 预览
 
-	![tdPack2](./tdPack2.gif)
+	![tdPack2](https://github.com/shines77/tdPack2_classic/raw/master/tdPack2.gif)
