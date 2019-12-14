@@ -3,6 +3,10 @@
 -- @Link   : https://dengsir.github.io
 -- @Date   : 9/2/2019, 9:12:59 PM
 
+if true then
+    return
+end
+
 local ns = select(2, ...)
 
 local bagButton
@@ -53,4 +57,5 @@ hooksecurefunc('ContainerFrame_OnShow', function(self)
     button:Show()
 end)
 
+CreateBagButton()
 CreateBankButton()

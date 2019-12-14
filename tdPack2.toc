@@ -2,6 +2,8 @@
 ## Title: tdPack2
 ## Author: Dencer
 ## Version: 1.0.1
+## Dependencies: BigFoot
+## X-Revision: BigFoot
 ## OptionalDeps: Bagnon, Combuctor, tdBag
 ## SavedVariables: TDDB_PACK2
 

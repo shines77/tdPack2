@@ -112,6 +112,7 @@ function ns.GetBagFamily(bag)
 end
 
 function ns.GetBagNumSlots(bag)
+    -- printf("GetContainerNumSlots(bag): bagId = %d, numSlots = %d.", bag, GetContainerNumSlots(bag))
     return GetContainerNumSlots(bag)
 end
 

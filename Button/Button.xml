@@ -3,6 +3,50 @@
     <Script file="tdBag.lua"/>
     <Script file="Bagnon.lua"/>
     <Script file="Combuctor.lua"/>
+    <Script file="BigFootCombuctor.lua"/>
     <Script file="Blizzard.lua"/>
     <Script file="Inventorian.lua"/>
+
+	<Button name="BFCombuctorBagToggleTemplate" virtual="true">
+		<Size x="32" y="32"/>
+		<HighlightTexture alphaMode="ADD" file="Interface\Minimap\UI-Minimap-ZoomButton-Highlight"/>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture parentKey="Icon" file="Interface\Buttons\Button-Backpack-Up">
+					<Size x="20" y="20"/>
+
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset x="7" y="-6"/>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0.075" right="0.925" top="0.075" bottom="0.925"/>
+				</Texture>
+			</Layer>
+
+			<Layer level="OVERLAY">
+				<Texture parentKey="Border" file="Interface\Minimap\MiniMap-TrackingBorder">
+					<Size x="54" y="54"/>
+
+					<Anchors>
+						<Anchor point="TOPLEFT"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+
+		<Scripts>
+			<OnLoad>
+				self:RegisterForClicks("anyUp")
+				self.Border:SetDesaturated(true)
+				self.Border:SetAlpha(0.6)
+			</OnLoad>
+			<OnMouseDown>
+				self.Icon:SetTexCoord(0,1,0,1)
+			</OnMouseDown>
+			<OnMouseUp>
+				self.Icon:SetTexCoord(0.075,0.925,0.075,0.925)
+			</OnMouseUp>
+		</Scripts>
+	</Button>
 </Ui>

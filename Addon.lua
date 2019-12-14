@@ -27,15 +27,15 @@ function Addon:OnInitialize()
             ruleOptionWindow = {point = 'CENTER', width = 637, height = 637},
             actions = {
                 [ns.COMMAND.BAG] = {
-                    [ns.CLICK_TOKENS.LEFT] = 'SORT',
+                    [ns.CLICK_TOKENS.LEFT] = 'SORT_BAG',
                     [ns.CLICK_TOKENS.RIGHT] = 'OPEN_RULE_OPTIONS',
-                    [ns.CLICK_TOKENS.CONTROL_LEFT] = 'SORT_BAG',
+                    [ns.CLICK_TOKENS.CONTROL_LEFT] = 'SORT',
                     [ns.CLICK_TOKENS.CONTROL_RIGHT] = 'OPEN_OPTIONS',
                 },
                 [ns.COMMAND.BANK] = {
-                    [ns.CLICK_TOKENS.LEFT] = 'SORT',
+                    [ns.CLICK_TOKENS.LEFT] = 'SORT_BANK',
                     [ns.CLICK_TOKENS.RIGHT] = 'OPEN_RULE_OPTIONS',
-                    [ns.CLICK_TOKENS.CONTROL_LEFT] = 'SORT_BANK',
+                    [ns.CLICK_TOKENS.CONTROL_LEFT] = 'SORT',
                     [ns.CLICK_TOKENS.CONTROL_RIGHT] = 'OPEN_OPTIONS',
                 },
             },
