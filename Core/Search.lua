@@ -37,9 +37,12 @@ end
 
 function Search:OnEnable()
     self:RegisterMessage('TDPACK_OPTION_CHANGED_applyLibItemSearch', 'UpdateLib')
+    self:UpdateLib()
 end
 
-function Search:UpdateLib(_, _, flag)
+function Search:UpdateLib()
+    local flag = ns.Addon:GetOption('applyLibItemSearch')
+
     for k, v in pairs(Filters) do
         ItemSearch.Filters[k] = flag and v or nil
     end
@@ -66,7 +69,7 @@ Filters.tdpackSpellName = {
     onlyTags = true,
 
     canSearch = function(self, operator, search)
-        return not operator and search
+        return search
     end,
 
     match = function(self, item, _, search)
@@ -82,7 +85,7 @@ Filters.tdPackEquippable = {
     exclude = tInvert{'INVTYPE_BAG', 'INVTYPE_AMMO'},
 
     canSearch = function(self, operator, search)
-        return not operator and (self.keyword1 == search or self.keyword2 == search:lower())
+        return self.keyword1 == search or self.keyword2 == search:lower()
     end,
 
     match = function(self, link, ...)

@@ -3,6 +3,17 @@
 -- @Link   : https://dengsir.github.io
 -- @Date   : 9/29/2019, 12:25:28 AM
 
+---- LUA
+local tinsert, tremove = table.insert, table.remove
+local pairs, ipairs, setmetatable = pairs, ipairs, setmetatable
+local coroutine = coroutine
+local floor = math.floor
+
+---- WOW
+local CreateFrame = CreateFrame
+local GetContainerItemLink = GetContainerItemLink
+local GetItemIcon = GetItemIcon
+
 ---@type ns
 local ns = select(2, ...)
 local L = ns.L
@@ -107,6 +118,9 @@ function RuleEditor:OnSetup()
     CommentInput:SetPoint('TOPLEFT', WhereDropDown, 'BOTTOMLEFT', 0, -30)
     CommentInput:SetPoint('TOPRIGHT', WhereDropDown, 'BOTTOMRIGHT', 0, -30)
     CommentInput:SetHeight(22)
+    CommentInput:HookScript('OnTextChanged', function()
+        self:UpdateValid()
+    end)
     self:CreateLabel(CommentInput, L['Name (Optional)'])
 
     local IconsFrame = CreateFrame('Frame', nil, Frame)
@@ -161,8 +175,6 @@ function RuleEditor:OnSetup()
         self:OnShow()
     end)
     Frame:SetScript('OnHide', Frame.Hide)
-
-    self.root = {children = Addon:GetSortingRules()}
 end
 
 function RuleEditor:OnShow()
@@ -196,12 +208,20 @@ function RuleEditor:OnSaveClick()
         comment = GetText(self.CommentInput),
         icon = self.selectedIcon,
     }
+
     if self.rule then
-        Addon:EditRule(item, self.rule)
+        local where = self.rule
+        ns.CopyFrom(wipe(where), item)
     else
-        Addon:AddRule(item, self.WhereDropDown:GetValue())
+        local where = self.WhereDropDown:GetValue()
+        where.children = where.children or {}
+        tinsert(where.children, item)
     end
     self:Hide()
+
+    if self.callback then
+        self.callback()
+    end
 end
 
 function RuleEditor:CreateWhereItemTable(profile)
@@ -227,7 +247,6 @@ function RuleEditor:CreateWhereItemTable(profile)
 
             tinsert(menuTable, {
                 checkable = true,
-                -- text = format('|T%s:12|t %s', icon, name),
                 text = name,
                 value = v,
                 checked = function(item, owner)
@@ -245,8 +264,9 @@ function RuleEditor:CreateWhereItemTable(profile)
 end
 
 function RuleEditor:UpdateValid()
-    -- local rule = GetText(self.RuleInput)
-    -- self.ExecButton:SetEnabled(rule)
+    local rule = GetText(self.RuleInput)
+    local name = GetText(self.CommentInput)
+    self.ExecButton:SetEnabled(rule or name)
 end
 
 function RuleEditor:SetIconButton(index, icon, row, column)
@@ -315,16 +335,17 @@ end
 
 function RuleEditor:IterateBags()
     return coroutine.wrap(function()
-        for _, bag in ipairs(ns.GetBags()) do
-            coroutine.yield(bag)
-        end
-        for _, bag in ipairs(ns.GetBanks()) do
-            coroutine.yield(bag)
+        for _, bagType in ipairs(ns.BAG_TYPES) do
+            for _, bag in ipairs(ns.GetBags(bagType)) do
+                coroutine.yield(bag)
+            end
         end
     end)
 end
 
-function RuleEditor:Open(rule)
+function RuleEditor:Open(rule, root, callback)
     self.rule = rule
+    self.callback = callback
+    self.root = {children = root}
     self:Show()
 end

@@ -15,6 +15,30 @@ function Addon:InitOptionFrame()
         return index
     end
 
+    local function toggle(text)
+        return {type = 'toggle', name = text, width = 'full', order = orderGen()}
+    end
+
+    local function execute(text, ...)
+        local confirm, func
+        local t = type(...)
+        if t == 'function' then
+            func = ...
+        else
+            confirm, func = ...
+        end
+
+        return {
+            type = 'execute',
+            name = text,
+            width = 'full',
+            order = orderGen(),
+            confirm = not not confirm,
+            confirmText = confirm,
+            func = func,
+        }
+    end
+
     local function drop(opts)
         local old = {}
         local new = {}
@@ -70,6 +94,7 @@ function Addon:InitOptionFrame()
                     {name = L.SORT_BANK, value = 'SORT_BANK'}, --
                     {name = L.SORT_BANK_ASC, value = 'SORT_BANK_ASC'}, --
                     {name = L.SORT_BANK_DESC, value = 'SORT_BANK_DESC'}, --
+                    {name = L.SAVE, value = 'SAVE'}, --
                     {name = L.OPEN_RULE_OPTIONS, value = 'OPEN_RULE_OPTIONS'}, --
                     {name = L.OPEN_OPTIONS, value = 'OPEN_OPTIONS'}, --
                 },
@@ -116,24 +141,41 @@ function Addon:InitOptionFrame()
                 name = GENERAL,
                 order = orderGen(),
                 args = {
-                    reverse = {type = 'toggle', name = L['Reverse pack'], width = 'full', order = orderGen()},
-                    console = {type = 'toggle', name = L['Enable chat message'], width = 'full', order = orderGen()},
-                    -- applyLibItemSearch = {
-                    --     type = 'toggle',
-                    --     name = L['Apply to LibItemSearch'],
-                    --     width = 'full',
-                    --     order = orderGen(),
-                    -- },
-                    resetSorting = {
-                        type = 'execute',
-                        name = L['Reset sorting rules'],
-                        width = 'full',
+                    default = {
+                        type = 'group',
+                        name = L.SORT,
                         order = orderGen(),
-                        confirm = true,
-                        confirmText = L['Are you sure to |cffff1919RESET|r sorting rules?'],
-                        func = function()
-                            Addon:ResetSortingRules()
-                        end,
+                        inline = true,
+                        args = { --
+                            reverse = toggle(L['Reverse pack']),
+                            saving = toggle(L['Save to bank when default packing']),
+                        },
+                    },
+                    global = {
+                        type = 'group',
+                        name = L['Global'],
+                        order = orderGen(),
+                        inline = true,
+                        args = {
+                            console = toggle(L['Enable chat message']),
+                            resetSorting = execute(L['Reset sorting rules'],
+                                                   L['Are you sure to |cffff1919RESET|r sorting rules?'], function()
+                                Addon:ResetRules(ns.SORT_TYPE.SORTING)
+                            end),
+                            resetSaving = execute(L['Reset saving rules'],
+                                                  L['Are you sure to |cffff1919RESET|r saving rules?'], function()
+                                Addon:ResetRules(ns.SORT_TYPE.SAVING)
+                            end),
+                        },
+                    },
+                    help = {
+                        type = 'group',
+                        name = L['Help'],
+                        order = orderGen(),
+                        inline = true,
+                        args = { --
+                            applyLibItemSearch = toggle(L['Add extension filter to LibItemSearch-1.2']),
+                        },
                     },
                 },
             },

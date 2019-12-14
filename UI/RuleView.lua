@@ -11,8 +11,8 @@ local ItemInfoCache = ns.ItemInfoCache
 
 ---- LUA
 local format = string.format
-local select, type = select, type
-local tContains = tContains
+local tremove = table.remove
+local select, type, ipairs = select, type, ipairs
 
 ---- WOW
 local ClearCursor = ClearCursor
@@ -26,8 +26,7 @@ local GameTooltip = GameTooltip
 local UIParent = UIParent
 
 ---- LOCAL
-local RED_FONT_COLOR_HEX = RED_FONT_COLOR:GenerateHexColor()
-local DEFAULT_ICON = 134400
+local DELETE, EDIT, CANCEL = DELETE, EDIT, CANCEL
 
 local RuleView = UI:NewClass('RuleView', UI.TreeView)
 
@@ -37,7 +36,10 @@ function RuleView:Constructor()
     self:SetItemTemplate('tdPack2RuleItemTemplate')
     self:SetCallback('OnItemFormatting', self.OnItemFormatting)
     self:SetCallback('OnItemEnter', self.OnItemEnter)
-    self:SetCallback('OnItemLeave', GameTooltip_Hide)
+    self:SetCallback('OnItemLeave', self.OnItemLeave)
+    self:SetCallback('OnItemClick', self.OnItemClick)
+    self:SetCallback('OnItemRightClick', self.OnItemRightClick)
+    self:SetCallback('OnCheckItemCanPutIn', self.OnCheckItemCanPutIn)
     self:SetScript('OnShow', self.OnShow)
     self:SetScript('OnHide', self.OnHide)
 end
@@ -61,6 +63,10 @@ function RuleView:CURSOR_UPDATE()
     end
 end
 
+function RuleView:OnCheckItemCanPutIn(from, to)
+    return ns.IsAdvanceRule(to)
+end
+
 function RuleView:OnItemFormatting(button, item, depth)
     local name, icon, rule, hasChild = ns.GetRuleInfo(item)
     button.Status:SetPoint('LEFT', 5 + 20 * (depth - 1), 0)
@@ -70,6 +76,14 @@ function RuleView:OnItemFormatting(button, item, depth)
     button.Status:SetShown(hasChild)
     button.Status:SetTexture(self:IsItemExpend(item) and [[Interface\Buttons\UI-MinusButton-UP]] or
                                  [[Interface\Buttons\UI-PlusButton-Up]])
+end
+
+function RuleView:OnItemClick(button)
+    self:ToggleItem(button.item)
+end
+
+function RuleView:OnItemRightClick(button)
+    self:ShowRuleMenu(button, button.item)
 end
 
 function RuleView:OnItemEnter(button)
@@ -88,9 +102,25 @@ function RuleView:OnItemEnter(button)
     GameTooltip:Show()
 end
 
+function RuleView:OnItemLeave()
+    GameTooltip:Hide()
+end
+
+local function Contains(tree, item)
+    for i, v in ipairs(tree) do
+        if v == item then
+            return true
+        elseif ns.IsAdvanceRule(v) then
+            if v.children and Contains(v.children, item) then
+                return true
+            end
+        end
+    end
+end
+
 function RuleView:StartCursorCatching(item)
     local catcher = self.cursorCatcher or self:CreateCursorCatcher()
-    local exists = tContains(self:GetItemTree(), item)
+    local exists = Contains(self:GetItemTree(), item)
     catcher.item = item
     catcher.exists = exists
     catcher.bg:SetShown(exists)
@@ -130,8 +160,8 @@ function RuleView:CreateCursorCatcher()
         local x, y = ns.GetCursorPosition()
         local button = self:AllocButton()
 
-        button.index = nil
-        button.parent = nil
+        button.parent = self:GetItemTree()
+        button.index = #button.parent + 1
         button.item = catcher.item
         button:SetWidth(self:GetWidth(), self.itemHeight)
         button:SetParent(UIParent)
@@ -142,7 +172,7 @@ function RuleView:CreateCursorCatcher()
         self:StartSorting(button)
     end
 
-    local function OnLeave()
+    local function OnLeave(catcher)
         if catcher:IsShown() then
             self:StopSorting()
         end
@@ -156,4 +186,39 @@ function RuleView:CreateCursorCatcher()
 
     self.cursorCatcher = catcher
     return catcher
+end
+
+function RuleView:ShowRuleMenu(button, item)
+    local name, icon, rule, hasChild = ns.GetRuleInfo(item)
+
+    ns.GUI:ToggleMenu(button, {
+        { --
+            text = format('|T%s:14|t %s', icon, name),
+            isTitle = true,
+        }, {isSeparator = true}, {
+            text = DELETE,
+            func = function(...)
+                UI.BlockDialog:Open({
+                    text = hasChild and L['Are you sure |cffff191919DELETE|r rule and its |cffff1919SUBRULES|r?'] or
+                        L['Are you sure |cffff191919DELETE|r rule?'],
+                    OnAccept = function()
+                        tremove(button.parent, button.index)
+                        self:Fire('OnListChanged')
+                    end,
+                })
+            end,
+        }, {
+            text = EDIT,
+            disabled = not ns.IsAdvanceRule(button.item),
+            func = function()
+                self:OpenEditor(button.item)
+            end,
+        }, {text = CANCEL},
+    })
+end
+
+function RuleView:OpenEditor(item)
+    UI.RuleEditor:Open(item, self:GetItemTree(), function()
+        self:Fire('OnListChanged')
+    end)
 end

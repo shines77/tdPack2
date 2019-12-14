@@ -13,25 +13,39 @@ local ns = select(2, ...)
 ---- NS
 local Addon = ns.Addon
 local Pack = ns.Pack
+local BAG_TYPE = ns.BAG_TYPE
 local COMMAND = ns.COMMAND
+local EXTRA_COMMAND = ns.EXTRA_COMMAND
 local ORDER = ns.ORDER
 
 ---- LOCAL
 local COMMAND_KEYS = tInvert{COMMAND.ALL, COMMAND.BAG, COMMAND.BANK}
 local ORDER_KEYS = tInvert{ORDER.ASC, ORDER.DESC}
+local EXTRA_COMMANDS_KEYS = tInvert{EXTRA_COMMAND.SAVE}
 
 function Addon:InitCommands()
     self:RegisterChatCommand('tdp', 'OnChatSlash')
 
-    self.orders = {
-        [ORDER.ASC] = function()
-            return false
-        end,
-        [ORDER.DESC] = function()
-            return true
-        end,
+    local function optTrue()
+        return true
+    end
+
+    local function optFalse()
+        return false
+    end
+
+    self.optOrders = {
+        [ORDER.ASC] = optFalse,
+        [ORDER.DESC] = optTrue,
         AUTO = function()
             return self:GetOption('reverse')
+        end,
+    }
+
+    self.optSavings = {
+        [EXTRA_COMMAND.SAVE] = optTrue,
+        AUTO = function()
+            return self:GetOption('saving')
         end,
     }
 
@@ -45,6 +59,7 @@ function Addon:InitCommands()
         SORT_BANK_DESC = self:Generate(COMMAND.BANK, ORDER.DESC),
         SORT_ASC = self:Generate(ORDER.ASC),
         SORT_DESC = self:Generate(ORDER.DESC),
+        SAVE = self:Generate(EXTRA_COMMAND.SAVE),
 
         OPEN_RULE_OPTIONS = function()
             ns.UI.RuleOption:Show()
@@ -58,48 +73,60 @@ end
 function Addon:OnChatSlash(text)
     local args = {}
     local cmd, offset
-    local command, order
-    repeat
+    while true do
         cmd, offset = self:GetArgs(text, nil, offset)
-        if COMMAND_KEYS[cmd] then
-            command = cmd
+        if not cmd then
+            break
         end
-        if ORDER_KEYS[cmd] then
-            order = cmd
-        end
-    until not cmd
 
-    self:Pack(self:ParseArgs(unpack(args)))
+        tinsert(args, cmd)
+    end
+
+    Pack:Start(self:ParseArgs(unpack(args)))
 end
 
 function Addon:ParseArgs(...)
-    local command, order
+    local command, order, extra
     local opts = {}
 
     for i = 1, select('#', ...) do
-        local cmd = select(i, ...)
+        local cmd = tostring(select(i, ...)):lower()
         if COMMAND_KEYS[cmd] then
             command = cmd
         end
         if ORDER_KEYS[cmd] then
             order = cmd
         end
+        if EXTRA_COMMANDS_KEYS[cmd] then
+            extra = cmd
+        end
     end
 
-    if not command or command == COMMAND.ALL then
-        opts.bank = true
-        opts.bag = true
+    if not command and not extra then
+        command = COMMAND.ALL
+    end
+
+    if command == COMMAND.ALL then
+        opts[BAG_TYPE.BANK] = true
+        opts[BAG_TYPE.BAG] = true
     elseif command == COMMAND.BAG then
-        opts.bag = true
+        opts[BAG_TYPE.BAG] = true
     elseif command == COMMAND.BANK then
-        opts.bank = true
+        opts[BAG_TYPE.BANK] = true
     end
 
     if not order then
-        opts.reverse = self.orders.AUTO
+        opts.reverse = self.optOrders.AUTO
     else
-        opts.reverse = self.orders[order]
+        opts.reverse = self.optOrders[order]
     end
+
+    if not extra then
+        opts.save = self.optSavings.AUTO
+    else
+        opts.save = self.optSavings[extra]
+    end
+
     return opts
 end
 

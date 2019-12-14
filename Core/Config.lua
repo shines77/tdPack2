@@ -3,6 +3,9 @@
 -- @Link   : https://dengsir.github.io
 -- @Date   : 8/31/2019, 7:22:32 PM
 
+local ipairs = ipairs
+local tinsert = table.insert
+
 ---@type ns
 local ns = select(2, ...)
 ---@type L
@@ -70,8 +73,9 @@ end
 local CONSUMABLE = GetItemClassInfo(LE_ITEM_CLASS_CONSUMABLE) -- 消耗品
 local QUEST = GetItemClassInfo(LE_ITEM_CLASS_QUESTITEM) -- 任务
 local MISC = GetItemClassInfo(LE_ITEM_CLASS_MISCELLANEOUS) -- 其它
+local TRADEGOODS = GetItemClassInfo(LE_ITEM_CLASS_TRADEGOODS) -- 商品
 
-ns.DEFAULT_CUSTOM_ORDER = {
+ns.DEFAULT_SORTING_RULES = {
     HEARTHSTONE_ITEM_ID, -- 炉石
     TipLocale('MOUNT', 132261), -- 坐骑
     Group(L['Tools'], 134065, {
@@ -79,6 +83,15 @@ ns.DEFAULT_CUSTOM_ORDER = {
         2901, -- 矿工锄
         5956, -- 铁匠锤
         7005, -- 剥皮刀
+        9149, -- 点金石
+        16207, -- 符文奥金棒
+        11145, -- 符文真银棒
+        11130, -- 符文金棒
+        6339, -- 符文银棒
+        6218, -- 符文铜棒
+        6219, -- 扳手
+        10498, -- 侏儒微调器
+        19727, -- 血镰刀
         Weapon(LE_ITEM_WEAPON_FISHINGPOLE, 132932), -- 鱼竿
     }), --
     Rule(EQUIPSET_EQUIP, 132722, 'equip', {
@@ -133,4 +146,9 @@ ns.DEFAULT_CUSTOM_ORDER = {
         Tip(ITEM_STARTS_QUEST, 132836), -- 接任务
         Rule(nil, 133942, 'spell'), --
     }), -- 任务
+}
+
+ns.DEFAULT_SAVING_RULES = { --
+    16885, -- 重垃圾箱
+    Rule(TRADEGOODS, 132905, 'type:' .. TRADEGOODS .. ' & !spell & !bop'),
 }
