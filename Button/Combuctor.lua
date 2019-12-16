@@ -84,9 +84,5 @@ function Combuctor.Frame:New(...)
             end
         end
     end
-
-        return f
-    else
-        return nil
-    end
+    return f
 end
