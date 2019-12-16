@@ -38,7 +38,7 @@ end
 -- For BigFoot's backpack addon Combuctor.
 --
 function PUI_Toggle(__switch)
-    print("Combuctor.PUI_Toggle();")
+    --print("Combuctor.PUI_Toggle();")
     if orig_PUI_Toggle then
         orig_PUI_Toggle(__switch)
 
@@ -60,7 +60,7 @@ function PUI_Toggle(__switch)
 end
 
 function Combuctor.Frame:New(...)
-    print("Combuctor.Frame:New();")
+    --print("Combuctor.Frame:New();")
     local f = nil
     if orig_FrameNew then
         f = orig_FrameNew(self, ...)

@@ -22,6 +22,7 @@ function Addon:OnInitialize()
     local defaults = {
         profile = {
             reverse = false,
+            saving = false,
             console = true,
             applyLibItemSearch = false,
             ruleOptionWindow = {point = 'CENTER', width = 637, height = 637},
