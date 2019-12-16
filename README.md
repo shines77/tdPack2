@@ -47,6 +47,8 @@
 
 	NGA论坛: [http://nga.178.com/read.php?tid=18399336](http://nga.178.com/read.php?tid=18399336)
 
+	GitHub: [https://github.com/DengSir/tdPack2/](https://github.com/DengSir/tdPack2/)
+
 	## 改良版本
 
 	**[主要改进]**
@@ -75,6 +77,8 @@
 	Homepage: [https://www.curseforge.com/wow/addons/tdpack2](https://www.curseforge.com/wow/addons/tdpack2)
 
 	NGA BBS: [http://nga.178.com/read.php?tid=18399336](http://nga.178.com/read.php?tid=18399336)
+
+	GitHub: [https://github.com/DengSir/tdPack2/](https://github.com/DengSir/tdPack2/)
 
 	## Modified version
 
