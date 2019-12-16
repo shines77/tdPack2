@@ -53,4 +53,5 @@ hooksecurefunc('ContainerFrame_OnShow', function(self)
     button:Show()
 end)
 
+CreateBagButton()
 CreateBankButton()
