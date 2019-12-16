@@ -22,6 +22,10 @@
 
 	**[Changelog]**
 
+		* 1.2.0
+			* 更新到 WoW Classic 1.13.3
+		* 1.1.0
+			* 新增整理背包并保存物品到银行的功能
 		* 1.0.1
 			* 添加规则设置界面
 		* 0.0.7
@@ -55,14 +59,22 @@
 
 		* 添加对大脚的自编背包插件 Combuctor 的支持
 		* 完善物品排序类别和顺序和默认规则
+		* 修改整理按钮默认的按钮行为设置
 
 	**[Changelog]**
+
+		* 1.2.0 modified
+			* 更新到 1.2.0 版本
+			* 添加对大脚的自编背包插件 Combuctor 的支持
+			* 完善物品排序类别和顺序和默认规则
+			* 修改整理按钮默认的按钮行为设置
 
 		* 1.0.1 modified
 			* 添加对大脚的自编背包插件 Combuctor 的支持
 			* 完善物品排序类别和顺序和默认规则
+			* 修改整理按钮默认的按钮行为设置
 
-	GitHub: [https://github.com/shines77/tdPack2_classic](https://github.com/shines77/tdPack2_classic)
+	GitHub: [https://github.com/shines77/tdPack2](https://github.com/shines77/tdPack2)
 
 * **[English / 英文]**
 
@@ -82,10 +94,10 @@
 
 	## Modified version
 
-	GitHub: [https://github.com/shines77/tdPack2_classic](https://github.com/shines77/tdPack2_classic)
+	GitHub: [https://github.com/shines77/tdPack2](https://github.com/shines77/tdPack2)
 
 * **[Preview / 预览]**
 
 	## Preview / 预览
 
-	![tdPack2](https://github.com/shines77/tdPack2_classic/raw/master/tdPack2.gif)
+	![tdPack2](https://github.com/shines77/tdPack2/raw/master/tdPack2.gif)
