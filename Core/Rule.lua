@@ -15,6 +15,9 @@ local pairs, setmetatable = pairs, setmetatable
 local format = string.format
 local tconcat, sort = table.concat, table.sort or sort
 
+---- ENUM
+local SORT_TYPE = ns.SORT_TYPE
+
 ---@class Rule
 local Rule = Addon:NewModule('Rule', 'AceEvent-3.0')
 
@@ -22,7 +25,7 @@ function Rule:OnInitialize()
     self.nameOrder = Item.GetItemName
     self.typeOrder = Item.GetItemType
     self.subTypeOrder = Item.GetItemSubType
-    self.customOrder = ns.CustomOrder:New()
+    self.sortingCustomOrder = ns.CustomOrder:New()
     self.levelQualityOrder = function(item)
         local level = 9999 - item:GetItemLevel()
         local quality = 99 - item:GetItemQuality()
@@ -40,7 +43,7 @@ function Rule:OnInitialize()
         end,
         GetOrder = function(item)
             return tconcat({
-                self.customOrder(item), --
+                self.sortingCustomOrder(item), --
                 self.typeOrder(item), --
                 self.subTypeOrder(item), --
                 self.levelQualityOrder(item), --
@@ -51,14 +54,10 @@ function Rule:OnInitialize()
 
     self.junkOrder = ns.JunkOrder:New()
     self.countOrder = function(item)
-        if ns.Pack:IsOptionReverse() then
-            return format('%04d', 9999 - item:GetItemCount())
-        else
-            return format('%04d', item:GetItemCount())
-        end
+        return format('%04d', 9999 - item:GetItemCount())
     end
 
-    self.itemOrder = ns.CachableOrder:New({
+    self.sortingOrder = ns.CachableOrder:New({
         cache = setmetatable({}, {__mode = 'k'}),
         GetKey = function(item)
             return item
@@ -72,24 +71,57 @@ function Rule:OnInitialize()
         end,
     })
 
-    self:RegisterMessage('TDPACK_SORTING_RULES_UPDATE', 'Rebuild')
-    self:RegisterMessage('TDPACK_PROFILE_CHANGED', 'Rebuild')
+    self.savingCustomOrder = ns.CustomOrder:New(true)
+
+    self.savingOrder = ns.CachableOrder:New({
+        cache = setmetatable({}, {__mode = 'k'}),
+        GetKey = function(item)
+            return item
+        end,
+        GetOrder = function(item)
+            return tconcat({
+                self.savingCustomOrder(item), --
+                self.levelQualityOrder(item), --
+                self.countOrder(item), --
+            })
+        end,
+    })
+
+    self.compares = {
+        [ns.SORT_TYPE.SORTING] = function(lhs, rhs)
+            return self.sortingOrder(lhs) < self.sortingOrder(rhs)
+        end,
+        [ns.SORT_TYPE.SAVING] = function(lhs, rhs)
+            return self.savingOrder(lhs) < self.savingOrder(rhs)
+        end,
+    }
+
+    self:RegisterMessage('TDPACK_SORTING_RULES_UPDATE', 'RebuildSorting')
+    self:RegisterMessage('TDPACK_SAVING_RULES_UPDATE', 'RebuildSaving')
+    self:RegisterMessage('TDPACK_PROFILE_CHANGED', 'RebuildAll')
 end
 
-function Rule:Rebuild()
-    self.junkOrder:RequestRebuild(Addon:GetSortingRules())
-    self.customOrder:RequestRebuild(Addon:GetSortingRules())
+function Rule:RebuildAll()
+    self:RebuildSorting()
+    self:RebuildSaving()
+end
+
+function Rule:RebuildSorting()
+    self.junkOrder:RequestRebuild(Addon:GetRules(SORT_TYPE.SORTING))
+    self.sortingCustomOrder:RequestRebuild(Addon:GetRules(SORT_TYPE.SORTING))
     self.staticOrder:RequestRebuild()
 end
 
-local function comp(lhs, rhs)
-    return Rule:GetOrder(lhs) < Rule:GetOrder(rhs)
+function Rule:RebuildSaving()
+    self.savingCustomOrder:RequestRebuild(Addon:GetRules(SORT_TYPE.SAVING))
 end
 
-function Rule:SortItems(items)
-    sort(items, comp)
+function Rule:SortItems(items, sortType)
+    sortType = sortType or SORT_TYPE.SORTING
+
+    sort(items, self.compares[sortType] or self.compares[SORT_TYPE.SORTING])
 end
 
-function Rule:GetOrder(item)
-    return self.itemOrder(item)
+function Rule:IsItemNeedJump(item)
+    return self.savingCustomOrder(item)
 end
