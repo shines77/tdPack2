@@ -3,7 +3,6 @@
     <Script file="tdBag.lua"/>
     <Script file="Bagnon.lua"/>
     <Script file="Combuctor.lua"/>
-    <Script file="BigFootCombuctor.lua"/>
     <Script file="Blizzard.lua"/>
     <Script file="Inventorian.lua"/>
 
